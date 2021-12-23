@@ -3,7 +3,7 @@ function preload(){
   sounds = {}
   soundDurations = loadJSON('soundDurations.json') //how many frames should this word be?
   for(var i = 0; i < toLoad.length; i ++){
-    sounds[toLoad[i]] = loadSound('numbers/' + toLoad[i] + '.mp3')
+    sounds[toLoad[i]] = new Audio('numbers/' + toLoad[i] + '.mp3')
   }
   quickSheep = createVideo('quickSheep.mp4')
   quickSheep.hide();
@@ -15,7 +15,7 @@ function setup() {
   myw = 1920 / 2
   myh = 1080 / 2
   myCanvas = createCanvas(myw, myh)
-  textAlign(CENTER,CENTER);fill(255); noStroke();textSize(30);
+  textAlign(CENTER,CENTER);fill(255); noStroke();textSize(30)
 
 
   numberInput = createInput();
@@ -32,6 +32,11 @@ function setup() {
 
   startCounting = false;
   quickSheepPlaying = false;
+
+  /*var keys = Object.keys(sounds)
+  for(var i = 0; i < keys.length; i ++){
+    sounds[keys[i]].onended = soundEnd
+  }*/
 }
 
 function draw() {
@@ -41,11 +46,13 @@ function draw() {
   fill(0);
   text("Jump to number:", 270, 520)
 
+
+
   if(startCounting)count();
 
   if(!startCounting){
     background(0,170); fill(255);
-    text('Press space to start counting',width/2,height/2)
+    text('Press space to start counting\n(Firefox not recommended)',width/2,height/2)
   }
 }
 
@@ -60,19 +67,11 @@ function vidEnd(){
 function count(){
   if( !stillSpeaking && !quickSheepPlaying ){
     quickSheep.stop();
-    stopAllSound();
     currentNumber ++
     sayNumber(currentNumber)
     quickSheep.play();
     quickSheepPlaying = true;
     lastVidStart = frameCount;
-  }
-}
-
-function stopAllSound(){
-  var keys = Object.keys(sounds)
-  for(var i = 0; i < keys.length; i ++){
-    sounds[keys[i]].stop();
   }
 }
 
@@ -100,8 +99,11 @@ function playArray(ar){
   }
   frameTimer ++;
 
-  if(currentWordIndex == ar.length - 1 && !sounds[ar[currentWordIndex]]._playing ){
-    stillSpeaking = false;
+  if(currentWordIndex == ar.length - 1){
+    var max = round(soundDurations[ar[currentWordIndex]])
+    if(frameTimer >= max + 50){
+      stillSpeaking = false;
+    }
   }
 }
 
