@@ -34,6 +34,10 @@ function setup() {
   quickSheepPlaying = false;
 }
 
+function windowResized(){
+  canvasPosition(numberInput, myCanvas, width/2,height - 30 )
+}
+
 function draw() {
   playArray(wordArray);
   image(freezeFrame, 0, 0, width, height)
