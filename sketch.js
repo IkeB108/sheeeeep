@@ -34,10 +34,6 @@ function setup() {
   quickSheepPlaying = false;
 }
 
-function windowResized(){
-  canvasPosition(numberInput, myCanvas, width/2,height - 30 )
-}
-
 function draw() {
   playArray(wordArray);
   image(freezeFrame, 0, 0, width, height)
@@ -53,6 +49,10 @@ function draw() {
   }
 }
 
+function windowResized(){
+  canvasPosition(numberInput, myCanvas, width/2,height - 30 )
+}
+
 function vidEnd(){
   quickSheepPlaying = false;
 }
@@ -60,11 +60,19 @@ function vidEnd(){
 function count(){
   if( !stillSpeaking && !quickSheepPlaying ){
     quickSheep.stop();
+    stopAllSound();
     currentNumber ++
     sayNumber(currentNumber)
     quickSheep.play();
     quickSheepPlaying = true;
     lastVidStart = frameCount;
+  }
+}
+
+function stopAllSound(){
+  var keys = Object.keys(sounds)
+  for(var i = 0; i < keys.length; i ++){
+    sounds[keys[i]].stop();
   }
 }
 
@@ -74,7 +82,7 @@ function keyTyped(){
 
 function keyPressed(){
   if(keyCode == ENTER && numberInput.value() > 0 && numberInput.value() < 1000000000000001 ){
-    currentNumber = int(round(numberInput.value())) - 1
+    currentNumber = round(int(numberInput.value())) - 1
   }
 }
 
