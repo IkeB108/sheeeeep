@@ -1,14 +1,21 @@
+setInterval = 200; //how many frames in between saying numbers?
+//set to -1 to have interval vary depending on length of number
+
 function preload(){
   var toLoad = 'billion eight eighteen eighty eleven fifteen fifty five forty four fourteen hundred million nine nineteen ninety one quadrillion quintillion seven seventeen seventy sextillion six sixteen sixty ten thirteen thirty thousand three trillion twelve twenty two'.split(' ')
   sounds = {}
   soundDurations = loadJSON('soundDurations.json') //how many frames should this word be?
   for(var i = 0; i < toLoad.length; i ++){
     sounds[toLoad[i]] = new Audio('numbers/' + toLoad[i] + '.mp3')
+    //sounds[toLoad[i]] = loadSound('numbers/' + toLoad[i] + '.mp3')
   }
   quickSheep = createVideo('quickSheep.mp4')
   quickSheep.hide();
   quickSheep.onended(vidEnd)
   freezeFrame = loadImage('freezeFrame.png')
+
+  sound421 = loadSound('421.mp3')
+  sound70 = loadSound('70.mp3')
 }
 
 function setup() {
@@ -54,6 +61,9 @@ function draw() {
     background(0,170); fill(255);
     text('Press space to start counting\n(Firefox not recommended)',width/2,height/2)
   }
+
+  if(sound421.isPlaying())stillSpeaking = true;
+  if(sound70.isPlaying())stillSpeaking = true;
 }
 
 function windowResized(){
@@ -65,7 +75,7 @@ function vidEnd(){
 }
 
 function count(){
-  if( !stillSpeaking && !quickSheepPlaying ){
+  if(  (setInterval == -1 && !stillSpeaking && !quickSheepPlaying) || (setInterval > 0 && frameCount % setInterval == 0) ){
     quickSheep.stop();
     currentNumber ++
     sayNumber(currentNumber)
@@ -86,7 +96,7 @@ function keyPressed(){
 }
 
 function playArray(ar){
-  if(currentWordIndex == 0 && frameTimer == 0){
+  if(currentWordIndex == 0 && frameTimer == 0 && ar.length > 0){
     sounds[ar[0]].play();
   }
   if(currentWordIndex < ar.length - 1){
@@ -107,6 +117,16 @@ function playArray(ar){
   }
 }
 
+function numberToArray(n){
+  var x  = numberToWords.toWords(n)
+  for(var i = 0; i < 20; i ++){
+    x = x.replace('-', ' ')
+    x = x.replace(',', '')
+  }
+  x = x.split(' ')
+  return x;
+}
+
 function sayNumber(n){
   var x = numberToWords.toWords(n)
   stillSpeaking = true;
@@ -118,12 +138,55 @@ function sayNumber(n){
   x = x.split(' ')
 
   wordArray = x
+
+  if(n == 70){
+    wordArray = []
+    sound70.play()
+  }
+  if(n == 420){
+    wordArray = []
+    sound421.play();
+  }
+
   currentWordIndex = 0;
   frameTimer = 0;
 }
 
 function s(st, newdur){
   soundDurations[st] = newdur
+}
+
+function longestNumber(n){
+  var longestN = 1;
+  var longestD = 1; //in frames
+  for(var i = 1; i < n; i ++){
+    var iName = numberToArray(i)
+    var durOfI = 0;
+    for(var j = 0; j < iName.length; j ++){
+      durOfI += soundDurations[ iName[j] ]
+    }
+    if(durOfI > longestD){
+      longestN = i;
+      longestD = durOfI
+    }
+  }
+  return [longestN, longestD] //longest N is 666,666
+}
+
+function orderDurs(){
+  var orderedDurs = []
+  var keys = Object.keys(soundDurations)
+  for(var i = 0; i < keys.length; i ++){
+    orderedDurs.push( {'name':keys[i], 'duration':soundDurations[keys[i]]} )
+  }
+  orderedDurs.sort( biggestDur )
+  return orderedDurs
+}
+
+function biggestDur(a, b){
+  if(a.duration > b.duration)return 1;
+  if(a.duration < b.duration)return -1;
+  if(a.duration == b.duration)return 0;
 }
 
 //numberToWords.toWords(num)
