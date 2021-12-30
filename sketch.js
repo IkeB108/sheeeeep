@@ -1,4 +1,4 @@
-setInterval = 200; //how many frames in between saying numbers?
+setInterval = -1; //how many frames in between saying numbers?
 //set to -1 to have interval vary depending on length of number
 
 function preload(){
@@ -62,8 +62,10 @@ function draw() {
     text('Press space to start counting\n(Firefox not recommended)',width/2,height/2)
   }
 
+  if(!sound421.isPlaying() || !sound70.isPlaying())stillSpeaking = false;
   if(sound421.isPlaying())stillSpeaking = true;
   if(sound70.isPlaying())stillSpeaking = true;
+
 }
 
 function windowResized(){
@@ -78,6 +80,7 @@ function count(){
   if(  (setInterval == -1 && !stillSpeaking && !quickSheepPlaying) || (setInterval > 0 && frameCount % setInterval == 0) ){
     quickSheep.stop();
     currentNumber ++
+    if(currentNumber == 420)currentNumber = 421;
     sayNumber(currentNumber)
     quickSheep.play();
     quickSheepPlaying = true;
@@ -143,7 +146,7 @@ function sayNumber(n){
     wordArray = []
     sound70.play()
   }
-  if(n == 420){
+  if(n == 421){
     wordArray = []
     sound421.play();
   }
